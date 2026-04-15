@@ -1,15 +1,16 @@
 # PST Resume Analyzer
 
-Analyzes an Outlook `.pst` email archive and uses Claude AI to extract resume-relevant information — projects, skills, achievements, and responsibilities — from thousands of work emails.
+Analyzes an Outlook `.pst` email archive and extracts resume-relevant information — projects, skills, achievements, and responsibilities — from thousands of work emails. Extraction can be tailored to a specific target role.
 
 ## Features
 
 - Streams through large `.pst` files without loading everything into memory
 - Skips non-work folders (deleted items, spam, travel, expenses, etc.)
-- Batches emails for efficient Claude API usage
+- **Role-aware extraction** — focus results on what matters for a specific position
+- Batches emails for efficient API usage
 - Auto-saves checkpoints every 10 batches so long runs can be resumed
 - Outputs a human-readable `.txt` report and structured `.json` file
-- Configurable model, batch size, body length, and folder filters
+- Fully configurable via `config.yaml` or CLI flags
 
 ## Setup
 
@@ -34,11 +35,11 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 3. Set your Anthropic API key
+### 3. Set your API key
 
 ```bash
 cp .env.example .env
-# Edit .env and paste your key from https://console.anthropic.com/api-keys
+# Edit .env and paste your API key
 ```
 
 ### 4. Configure your PST path
@@ -55,6 +56,11 @@ pst_path: "C:\\Users\\you\\Documents\\Outlook Files\\archive.pst"
 # Full run (reads all settings from config.yaml)
 python analyze.py
 
+# Tailor extraction for a specific target role
+python analyze.py --role "Sr.SA Manager"
+python analyze.py --role "Principal Solutions Architect"
+python analyze.py --role "Director of Cloud Engineering"
+
 # Test with just 200 emails first (recommended before a full run)
 python analyze.py --test 200
 
@@ -63,9 +69,6 @@ python analyze.py --folders
 
 # Resume an interrupted run from the last checkpoint
 python analyze.py --resume
-
-# Use a higher-quality model for the final run
-python analyze.py --model claude-sonnet-4-6
 
 # Override PST path or output directory on the fly
 python analyze.py --pst "D:\backup\old.pst" --output "results"
@@ -95,7 +98,8 @@ All settings live in `config.yaml`:
 |---|---|---|
 | `pst_path` | *(required)* | Path to your `.pst` file |
 | `output_dir` | `output` | Where to write results |
-| `model` | `claude-haiku-4-5-20251001` | Claude model to use |
+| `role` | *(blank)* | Target role to tailor extraction toward |
+| `model` | `claude-haiku-4-5-20251001` | AI model to use |
 | `batch_size` | `50` | Emails per API call |
 | `max_body_chars` | `500` | Max email body length |
 | `skip_folders` | see config | Folder names to ignore |
@@ -103,4 +107,4 @@ All settings live in `config.yaml`:
 ## Privacy
 
 - Your `.env` (API key) and `output/` (extracted email data) are excluded from git via `.gitignore`
-- Your `.pst` file is never uploaded or transmitted — only short text excerpts are sent to the Claude API for analysis
+- Your `.pst` file is never uploaded or transmitted — only short text excerpts are sent to the API for analysis

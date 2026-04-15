@@ -3,15 +3,16 @@
 PST Resume Analyzer
 -------------------
 Analyzes an Outlook .pst archive and extracts resume-relevant information
-(projects, skills, achievements, responsibilities) using Claude AI.
+(projects, skills, achievements, responsibilities).
 
 Usage:
-    python analyze.py                        # full run using config.yaml
-    python analyze.py --test 200             # test with first 200 emails
-    python analyze.py --resume               # resume from last checkpoint
-    python analyze.py --pst path/to/file.pst # override pst path
-    python analyze.py --model claude-sonnet-4-6  # use a different model
-    python analyze.py --folders              # list folders in the PST and exit
+    python analyze.py                            # full run using config.yaml
+    python analyze.py --role "Sr.SA Manager"     # tailor extraction for a role
+    python analyze.py --test 200                 # test with first 200 emails
+    python analyze.py --resume                   # resume from last checkpoint
+    python analyze.py --pst path/to/file.pst     # override pst path
+    python analyze.py --model haiku              # use a different model
+    python analyze.py --folders                  # list folders in the PST and exit
 """
 
 import os
@@ -44,14 +45,16 @@ def load_config(config_path: Path) -> dict:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Analyze a .pst email archive and extract resume-relevant information using Claude AI.",
+        description="Analyze a .pst email archive and extract resume-relevant information.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )
     parser.add_argument("--pst",     help="Path to .pst file (overrides config.yaml)")
     parser.add_argument("--output",  help="Output directory (overrides config.yaml)")
-    parser.add_argument("--model",   help="Claude model ID (overrides config.yaml)")
+    parser.add_argument("--model",   help="Model ID (overrides config.yaml)")
     parser.add_argument("--config",  default="config.yaml", help="Path to config file")
+    parser.add_argument("--role",    default="", metavar="ROLE",
+                        help='Target role to tailor extraction for, e.g. "Sr.SA Manager"')
     parser.add_argument("--test",    type=int, default=0, metavar="N",
                         help="Only process first N emails (for testing/cost estimation)")
     parser.add_argument("--resume",  action="store_true",
@@ -74,6 +77,7 @@ def main():
     max_body     = config.get("max_body_chars", 500)
     skip_folders = set(config.get("skip_folders", []))
     test_limit   = args.test
+    role         = args.role or config.get("role", "")
 
     if not pst_path.exists():
         print(f"Error: PST file not found: {pst_path}", file=sys.stderr)
@@ -101,6 +105,8 @@ def main():
     print(f"  PST    : {pst_path}")
     print(f"  Model  : {model}")
     print(f"  Output : {output_dir}")
+    if role:
+        print(f"  Role   : {role}")
     if test_limit:
         print(f"  Mode   : TEST ({test_limit} emails only)")
     print()
@@ -139,7 +145,7 @@ def main():
             total_batches += 1
             print(f"  Batch {total_batches:4d} | {total_emails:6,} emails processed ...", end=" ", flush=True)
             try:
-                result = analyze_batch(batch, model)
+                result = analyze_batch(batch, model, role)
                 all_results.append(result)
                 n_proj  = len(result.get("projects", []))
                 n_skill = len(result.get("skills", []))
@@ -158,7 +164,7 @@ def main():
         total_batches += 1
         print(f"  Batch {total_batches:4d} | {total_emails:6,} emails (final) ...", end=" ", flush=True)
         try:
-            result = analyze_batch(batch, model)
+            result = analyze_batch(batch, model, role)
             all_results.append(result)
             print("done")
         except Exception as e:

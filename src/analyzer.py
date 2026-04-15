@@ -1,4 +1,4 @@
-"""Claude API batching and resume-relevant extraction from emails."""
+"""AI-powered batching and resume-relevant extraction from emails."""
 
 import re
 import json
@@ -14,7 +14,7 @@ def get_client() -> anthropic.Anthropic:
     return _client
 
 
-SYSTEM_PROMPT = """You are a career coach and resume writer. Analyze work emails and extract resume-relevant information.
+_BASE_PROMPT = """You are a career coach and resume writer. Analyze work emails and extract resume-relevant information.
 
 Focus on:
 1. PROJECTS — names, goals, outcomes, deliverables
@@ -36,6 +36,21 @@ Return a JSON object with exactly these keys:
 
 Only include clearly resume-relevant items. Skip personal or purely administrative emails.
 Return valid JSON only — no text outside the JSON."""
+
+_ROLE_SUFFIX = """
+
+The target role is: {role}
+
+Prioritize and highlight information most relevant to this role. When extracting projects,
+skills, achievements, and responsibilities, give preference to experience that directly
+supports a candidacy for this position. Include relevant transferable skills and leadership
+experience that align with what hiring managers look for in a {role}."""
+
+
+def build_system_prompt(role: str) -> str:
+    if role:
+        return _BASE_PROMPT + _ROLE_SUFFIX.format(role=role)
+    return _BASE_PROMPT
 
 
 def clean_text(text: str) -> str:
@@ -76,17 +91,19 @@ def format_email(folder: str, message, max_body_chars: int) -> str:
     )
 
 
-def analyze_batch(batch: list[str], model: str) -> dict:
-    """Send a batch of formatted emails to Claude and return structured resume data."""
+def analyze_batch(batch: list[str], model: str, role: str = "") -> dict:
+    """Send a batch of formatted emails and return structured resume data."""
     combined = "\n\n---\n\n".join(batch)
+    user_content = f"Analyze these {len(batch)} work emails and extract resume-relevant information"
+    if role:
+        user_content += f" for the role of {role}"
+    user_content += f":\n\n{combined}"
+
     response = get_client().messages.create(
         model=model,
         max_tokens=1024,
-        system=SYSTEM_PROMPT,
-        messages=[{
-            "role": "user",
-            "content": f"Analyze these {len(batch)} work emails and extract resume-relevant information:\n\n{combined}",
-        }],
+        system=build_system_prompt(role),
+        messages=[{"role": "user", "content": user_content}],
     )
     raw = response.content[0].text.strip()
     raw = re.sub(r"^```json\s*", "", raw)
