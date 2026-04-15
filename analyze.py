@@ -77,7 +77,9 @@ def main():
     max_body     = config.get("max_body_chars", 500)
     skip_folders = set(config.get("skip_folders", []))
     test_limit   = args.test
-    role         = args.role or config.get("role", "")
+    role         = args.role        or config.get("role", "")
+    provider     = config.get("provider", "anthropic")
+    aws_region   = config.get("aws_region", "us-east-1")
 
     if not pst_path.exists():
         print(f"Error: PST file not found: {pst_path}", file=sys.stderr)
@@ -102,11 +104,14 @@ def main():
         return
 
     print("PST Resume Analyzer")
-    print(f"  PST    : {pst_path}")
-    print(f"  Model  : {model}")
-    print(f"  Output : {output_dir}")
+    print(f"  PST      : {pst_path}")
+    print(f"  Provider : {provider}")
+    print(f"  Model    : {model}")
+    print(f"  Output   : {output_dir}")
+    if provider == "bedrock":
+        print(f"  Region   : {aws_region}")
     if role:
-        print(f"  Role   : {role}")
+        print(f"  Role     : {role}")
     if test_limit:
         print(f"  Mode   : TEST ({test_limit} emails only)")
     print()
@@ -145,7 +150,7 @@ def main():
             total_batches += 1
             print(f"  Batch {total_batches:4d} | {total_emails:6,} emails processed ...", end=" ", flush=True)
             try:
-                result = analyze_batch(batch, model, role)
+                result = analyze_batch(batch, model, role, provider, aws_region)
                 all_results.append(result)
                 n_proj  = len(result.get("projects", []))
                 n_skill = len(result.get("skills", []))
@@ -164,7 +169,7 @@ def main():
         total_batches += 1
         print(f"  Batch {total_batches:4d} | {total_emails:6,} emails (final) ...", end=" ", flush=True)
         try:
-            result = analyze_batch(batch, model, role)
+            result = analyze_batch(batch, model, role, provider, aws_region)
             all_results.append(result)
             print("done")
         except Exception as e:

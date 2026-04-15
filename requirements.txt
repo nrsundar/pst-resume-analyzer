@@ -1,3 +1,4 @@
-anthropic>=0.40.0
-libpff-python>=20231205
-pyyaml>=6.0
+# Core dependencies
+anthropic[bedrock]>=0.40.0   # includes AnthropicBedrock for AWS Bedrock support
+libpff-python>=20231205       # PST file parsing
+pyyaml>=6.0                   # config.yaml support

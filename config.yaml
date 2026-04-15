@@ -13,9 +13,18 @@ output_dir: "output"
 # Leave blank for general resume extraction.
 role: ""
 
+# Provider: "anthropic" (direct API key) or "bedrock" (AWS account)
+# See README for setup instructions for each provider.
+provider: "anthropic"
+
+# AWS region for Bedrock (only used when provider is "bedrock")
+# Supported regions: us-east-1, us-west-2, eu-west-1, ap-northeast-1
+aws_region: "us-east-1"
+
 # AI model to use. Always pin to the latest available model for best results.
+# The same friendly name works for both providers — the tool maps it automatically.
 # claude-opus-4-6            → highest quality, most expensive
-# claude-sonnet-4-6          → best balance of quality and cost (default)
+# claude-sonnet-4-6          → best balance of quality and cost
 # claude-haiku-4-5-20251001  → fastest, cheapest (~$6-9 for 85k emails)
 model: "claude-opus-4-6"
 

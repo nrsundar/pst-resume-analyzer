@@ -1,17 +1,43 @@
-"""AI-powered batching and resume-relevant extraction from emails."""
+"""AI-powered batching and resume-relevant extraction from emails.
+
+Supports two providers:
+  - "anthropic"  : Direct Anthropic API (requires ANTHROPIC_API_KEY)
+  - "bedrock"    : AWS Bedrock (requires AWS credentials)
+"""
 
 import re
 import json
-import anthropic
 
 _client = None
+_current_provider = None
+
+# Maps friendly model names to their Bedrock model IDs
+BEDROCK_MODEL_IDS = {
+    "claude-opus-4-6":          "global.anthropic.claude-opus-4-6-v1",
+    "claude-sonnet-4-6":        "global.anthropic.claude-sonnet-4-6",
+    "claude-haiku-4-5-20251001": "anthropic.claude-haiku-4-5-20251001-v1:0",
+}
 
 
-def get_client() -> anthropic.Anthropic:
-    global _client
-    if _client is None:
-        _client = anthropic.Anthropic()
+def get_client(provider: str, aws_region: str = "us-east-1"):
+    """Return a cached API client for the given provider."""
+    global _client, _current_provider
+    if _client is None or _current_provider != provider:
+        if provider == "bedrock":
+            from anthropic import AnthropicBedrock
+            _client = AnthropicBedrock(aws_region=aws_region)
+        else:
+            from anthropic import Anthropic
+            _client = Anthropic()
+        _current_provider = provider
     return _client
+
+
+def resolve_model_id(model: str, provider: str) -> str:
+    """Translate a friendly model name to the correct ID for the provider."""
+    if provider == "bedrock":
+        return BEDROCK_MODEL_IDS.get(model, model)
+    return model
 
 
 _BASE_PROMPT = """You are a career coach and resume writer. Analyze work emails and extract resume-relevant information.
@@ -91,7 +117,8 @@ def format_email(folder: str, message, max_body_chars: int) -> str:
     )
 
 
-def analyze_batch(batch: list[str], model: str, role: str = "") -> dict:
+def analyze_batch(batch: list[str], model: str, role: str = "",
+                  provider: str = "anthropic", aws_region: str = "us-east-1") -> dict:
     """Send a batch of formatted emails and return structured resume data."""
     combined = "\n\n---\n\n".join(batch)
     user_content = f"Analyze these {len(batch)} work emails and extract resume-relevant information"
@@ -99,8 +126,11 @@ def analyze_batch(batch: list[str], model: str, role: str = "") -> dict:
         user_content += f" for the role of {role}"
     user_content += f":\n\n{combined}"
 
-    response = get_client().messages.create(
-        model=model,
+    client = get_client(provider, aws_region)
+    model_id = resolve_model_id(model, provider)
+
+    response = client.messages.create(
+        model=model_id,
         max_tokens=1024,
         system=build_system_prompt(role),
         messages=[{"role": "user", "content": user_content}],
