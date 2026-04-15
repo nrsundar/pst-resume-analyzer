@@ -78,8 +78,8 @@ python analyze.py --pst "D:\backup\old.pst" --output "results"
 
 | Model | ~85k emails | Quality |
 |---|---|---|
-| `claude-sonnet-4-6` (default) | ~$70–90 | Best |
-| `claude-opus-4-6` | ~$300–350 | Highest |
+| `claude-opus-4-6` (default) | ~$300–350 | Highest |
+| `claude-sonnet-4-6` | ~$70–90 | Best |
 | `claude-haiku-4-5-20251001` | ~$6–9 | Good |
 
 Run `--test 200` first to verify results before committing to a full run.
@@ -100,7 +100,7 @@ All settings live in `config.yaml`:
 | `pst_path` | *(required)* | Path to your `.pst` file |
 | `output_dir` | `output` | Where to write results |
 | `role` | *(blank)* | Target role to tailor extraction toward |
-| `model` | `claude-sonnet-4-6` | AI model to use |
+| `model` | `claude-opus-4-6` | AI model to use |
 | `batch_size` | `50` | Emails per API call |
 | `max_body_chars` | `500` | Max email body length |
 | `skip_folders` | see config | Folder names to ignore |

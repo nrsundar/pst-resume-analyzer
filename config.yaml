@@ -17,7 +17,7 @@ role: ""
 # claude-opus-4-6            → highest quality, most expensive
 # claude-sonnet-4-6          → best balance of quality and cost (default)
 # claude-haiku-4-5-20251001  → fastest, cheapest (~$6-9 for 85k emails)
-model: "claude-sonnet-4-6"
+model: "claude-opus-4-6"
 
 # Number of emails sent per API call
 batch_size: 50
