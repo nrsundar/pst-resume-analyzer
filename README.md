@@ -26,7 +26,7 @@ Download and install from [kiro.dev](https://kiro.dev). Supports Windows 10/11 (
 1. Download the installer for your OS from [kiro.dev](https://kiro.dev)
 2. Run the installer and follow the prompts
 3. On first launch, authenticate with GitHub, Google, AWS Builder ID, or AWS IAM Identity Center
-4. Open the cloned `pst-resume-analyzer` folder as your project
+4. Open the cloned `pst-analyzer` folder as your project
 
 ### Kiro CLI
 
@@ -63,8 +63,8 @@ chmod +x kiro-cli.appimage
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/nrsundar/pst-resume-analyzer.git
-cd pst-resume-analyzer
+git clone https://github.com/nrsundar/pst-analyzer.git
+cd pst-analyzer
 ```
 
 ### 2. Create a virtual environment and install dependencies
