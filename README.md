@@ -12,6 +12,49 @@ Analyzes an Outlook `.pst` email archive and extracts resume-relevant informatio
 - Outputs a human-readable `.txt` report and structured `.json` file
 - Fully configurable via `config.yaml` or CLI flags
 
+## Kiro IDE / Kiro CLI
+
+This project works seamlessly with [Kiro](https://kiro.dev) — an agentic AI IDE and CLI. You can use either the desktop IDE or the lightweight CLI.
+
+### Kiro IDE (Desktop)
+
+Download and install from [kiro.dev](https://kiro.dev). Supports Windows 10/11 (64-bit), macOS (Intel & Apple Silicon), and Linux (glibc 2.39+, Ubuntu 24+, Fedora 40+).
+
+1. Download the installer for your OS from [kiro.dev](https://kiro.dev)
+2. Run the installer and follow the prompts
+3. On first launch, authenticate with GitHub, Google, AWS Builder ID, or AWS IAM Identity Center
+4. Open the cloned `pst-resume-analyzer` folder as your project
+
+### Kiro CLI
+
+**macOS / Linux**
+```bash
+curl -fsSL https://cli.kiro.dev/install | bash
+```
+
+**Windows** (PowerShell or Windows Terminal — not Command Prompt)
+```powershell
+irm 'https://cli.kiro.dev/install.ps1' | iex
+```
+
+**Linux — Ubuntu (.deb)**
+```bash
+wget https://desktop-release.q.us-east-1.amazonaws.com/latest/kiro-cli.deb
+sudo dpkg -i kiro-cli.deb
+sudo apt-get install -f
+```
+
+**Linux — AppImage**
+```bash
+wget https://desktop-release.q.us-east-1.amazonaws.com/latest/kiro-cli.appimage
+chmod +x kiro-cli.appimage
+./kiro-cli.appimage
+```
+
+> If you run into installation issues, run `kiro-cli doctor` to diagnose and fix common problems.
+
+---
+
 ## Setup
 
 ### 1. Clone the repo
