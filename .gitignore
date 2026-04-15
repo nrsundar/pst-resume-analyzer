@@ -1,0 +1,22 @@
+# API keys — never commit
+.env
+
+# Output files contain personal email data
+output/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# PST files are large and personal
+*.pst
+
+# OS
+.DS_Store
+Thumbs.db

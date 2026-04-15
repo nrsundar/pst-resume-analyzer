@@ -1,0 +1,38 @@
+# PST Resume Analyzer — Configuration
+# ------------------------------------
+# All settings can be overridden via CLI flags (see python analyze.py --help)
+
+# Path to your Outlook .pst archive
+pst_path: "F:\\WorkBackups\\03242022\\MyMails\\Outlook.pst"
+
+# Where to write output files (resume_extraction.txt / .json)
+output_dir: "output"
+
+# Claude model to use.
+# claude-haiku-4-5-20251001  → fastest, cheapest (~$6-9 for 85k emails)
+# claude-sonnet-4-6          → higher quality, ~10x more expensive
+model: "claude-haiku-4-5-20251001"
+
+# Number of emails sent to Claude per API call
+batch_size: 50
+
+# Max characters of email body to include (keeps token cost low)
+max_body_chars: 500
+
+# Folders to skip entirely (case-insensitive substring match against folder name)
+skip_folders:
+  - deleted items
+  - spam
+  - junk
+  - trash
+  - sent items
+  - outbox
+  - drafts
+  - rss feeds
+  - sync issues
+  - loft
+  - reinvent
+  - ako
+  - travels & expenses
+  - expenses
+  - mac2pc
