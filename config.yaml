@@ -13,10 +13,11 @@ output_dir: "output"
 # Leave blank for general resume extraction.
 role: ""
 
-# AI model to use.
+# AI model to use. Always pin to the latest available model for best results.
+# claude-opus-4-6            → highest quality, most expensive
+# claude-sonnet-4-6          → best balance of quality and cost (default)
 # claude-haiku-4-5-20251001  → fastest, cheapest (~$6-9 for 85k emails)
-# claude-sonnet-4-6          → higher quality, ~10x more expensive
-model: "claude-haiku-4-5-20251001"
+model: "claude-sonnet-4-6"
 
 # Number of emails sent per API call
 batch_size: 50

@@ -72,7 +72,7 @@ def main():
 
     pst_path     = Path(args.pst    or config["pst_path"])
     output_dir   = Path(args.output or config.get("output_dir", "output"))
-    model        = args.model       or config.get("model", "claude-haiku-4-5-20251001")
+    model        = args.model       or config.get("model", "claude-sonnet-4-6")
     batch_size   = config.get("batch_size", 50)
     max_body     = config.get("max_body_chars", 500)
     skip_folders = set(config.get("skip_folders", []))
